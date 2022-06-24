@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.portfolio.dto.ProfileDTO;
 import com.portfolio.model.Profile;
 import com.portfolio.service.PortfolioService;
 
@@ -31,7 +30,7 @@ public class PortfolioController {
 	public ResponseEntity<List<Profile>> getAllProfiles() {
 		return ResponseEntity.ok(portfolioService.getAllProfiles());
 	}
-	
+
 	@GetMapping("/profile/{id}")
 	public ResponseEntity<Profile> getProfile(@PathVariable("id") String id) {
 		return ResponseEntity.ok(portfolioService.getProfile(Long.parseLong(id)));
@@ -39,18 +38,18 @@ public class PortfolioController {
 
 	@PostMapping("/profile")
 	public ResponseEntity<?> createProfile(@RequestBody Profile profile) {
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-				                             .path("/{id}")
-				                             .buildAndExpand(portfolioService.createProfile(profile).getId()).toUri();
+		Profile createdProfile = portfolioService.createProfile(profile);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(createdProfile.getId())
+				.toUri();
 		return ResponseEntity.created(uri).build();
 	}
 
 	@PutMapping("/profile")
 	public ResponseEntity<?> updateProfile(@RequestBody Profile profile) {
-		ProfileDTO updatedProfile = portfolioService.updateProfile(profile);
-		if(updatedProfile != null) {
+		Profile updatedProfile = portfolioService.updateProfile(profile);
+		if (updatedProfile != null) {
 			return new ResponseEntity<>(HttpStatus.OK);
-		}else {
+		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
