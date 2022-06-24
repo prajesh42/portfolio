@@ -1,10 +1,9 @@
 package com.portfolio.model;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.portfolio.dto.ProfileDTO;
-import com.portfolio.dto.ProjectDetailDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,26 +19,22 @@ public class Profile {
 	private Long id;
 	private String name;
 	private Address address;
-	private String education;
-	private String skills;
-	private String languages;
-	private String experiences;
+	private Set<Education> educations;
+	private Set<Skill> skills;
+	private Set<Language> languages;
+	private Set<Experience> experiences;
 	private Set<ProjectDetail> projects;
 
 	public ProfileDTO mapProfile() {
 		ProfileDTO profileDTO = new ProfileDTO();
 		profileDTO.setId(id);
 		profileDTO.setName(name);
-		profileDTO.setEducation(education);
+		profileDTO.setEducations(educations.stream().map(Education::mapEducation).collect(Collectors.toSet()));
 		profileDTO.setAddress(address.mapAddress());
-		profileDTO.setSkills(skills);
-		profileDTO.setLanguages(languages);
-		Set<ProjectDetailDTO> projectDetails=new HashSet<ProjectDetailDTO>();
-		for(ProjectDetail projectDetail: projects) {
-			projectDetails.add(projectDetail.mapProjectDetail());
-		}
-		profileDTO.setProjects(projectDetails);
-		profileDTO.setExperiences(experiences);
+		profileDTO.setSkills(skills.stream().map(Skill::mapSkill).collect(Collectors.toSet()));
+		profileDTO.setLanguages(languages.stream().map(Language::mapLanguage).collect(Collectors.toSet()));
+		profileDTO.setProjects(projects.stream().map(ProjectDetail::mapProjectDetail).collect(Collectors.toSet()));
+		profileDTO.setExperiences(experiences.stream().map(Experience::mapExperience).collect(Collectors.toSet()));
 		return profileDTO;
 	}
 }
