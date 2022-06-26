@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.portfolio.Exception.PortfolioDataException;
+import com.portfolio.Exception.PortfolioInternalServerError;
 import com.portfolio.model.Profile;
 import com.portfolio.service.PortfolioService;
 
@@ -27,36 +29,75 @@ public class PortfolioController {
 	private PortfolioService portfolioService;
 
 	@GetMapping("/profiles")
-	public ResponseEntity<List<Profile>> getAllProfiles() {
-		return ResponseEntity.ok(portfolioService.getAllProfiles());
+	public ResponseEntity<List<Profile>> getAllProfiles() throws PortfolioDataException, PortfolioInternalServerError {
+		try {
+			return ResponseEntity.ok(portfolioService.getAllProfiles());
+		} catch (PortfolioDataException pe) {
+			throw pe;
+		} catch (Exception ex) {
+			throw new PortfolioInternalServerError("PORTFOLIO-110101", "Error occurred while processing your request",
+					ex);
+		}
 	}
 
 	@GetMapping("/profile/{id}")
-	public ResponseEntity<Profile> getProfile(@PathVariable("id") String id) {
-		return ResponseEntity.ok(portfolioService.getProfile(Long.parseLong(id)));
+	public ResponseEntity<Profile> getProfile(@PathVariable("id") String id)
+			throws NumberFormatException, PortfolioDataException, PortfolioInternalServerError {
+		try {
+			return ResponseEntity.ok(portfolioService.getProfile(Long.parseLong(id)));
+		} catch (PortfolioDataException pe) {
+			throw pe;
+		} catch (Exception ex) {
+			throw new PortfolioInternalServerError("PORTFOLIO-110201", "Error occurred while processing your request",
+					ex);
+		}
 	}
 
 	@PostMapping("/profile")
-	public ResponseEntity<?> createProfile(@RequestBody Profile profile) {
-		Profile createdProfile = portfolioService.createProfile(profile);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(createdProfile.getId())
-				.toUri();
-		return ResponseEntity.created(uri).build();
+	public ResponseEntity<?> createProfile(@RequestBody Profile profile)
+			throws PortfolioDataException, PortfolioInternalServerError {
+		try {
+			Profile createdProfile = portfolioService.createProfile(profile);
+			URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+					.buildAndExpand(createdProfile.getId()).toUri();
+			return ResponseEntity.created(uri).build();
+		} catch (PortfolioDataException pe) {
+			throw pe;
+		} catch (Exception ex) {
+			throw new PortfolioInternalServerError("PORTFOLIO-110301", "Error occurred while processing your request",
+					ex);
+		}
 	}
 
 	@PutMapping("/profile")
-	public ResponseEntity<?> updateProfile(@RequestBody Profile profile) {
-		Profile updatedProfile = portfolioService.updateProfile(profile);
-		if (updatedProfile != null) {
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<?> updateProfile(@RequestBody Profile profile)
+			throws PortfolioDataException, PortfolioInternalServerError {
+		try {
+			Profile updatedProfile = portfolioService.updateProfile(profile);
+			if (updatedProfile != null) {
+				return new ResponseEntity<>(HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (PortfolioDataException pe) {
+			throw pe;
+		} catch (Exception ex) {
+			throw new PortfolioInternalServerError("PORTFOLIO-110401", "Error occurred while processing your request",
+					ex);
 		}
 	}
 
 	@DeleteMapping("/profile/{id}")
-	public ResponseEntity<?> deleteProfile(@PathVariable("id") String id) {
-		portfolioService.deleteProfile(Long.parseLong(id));
-		return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+	public ResponseEntity<?> deleteProfile(@PathVariable("id") String id)
+			throws NumberFormatException, PortfolioDataException, PortfolioInternalServerError {
+		try {
+			portfolioService.deleteProfile(Long.parseLong(id));
+			return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+		} catch (PortfolioDataException pe) {
+			throw pe;
+		} catch (Exception ex) {
+			throw new PortfolioInternalServerError("PORTFOLIO-110501", "Error occurred while processing your request",
+					ex);
+		}
 	}
 }
